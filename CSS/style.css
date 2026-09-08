@@ -1,0 +1,39 @@
+
+body{
+    background:white;
+   
+}
+
+
+#gameCanvas{
+    
+    border: 5px solid black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 600px;
+    height: 600px
+}
+ /*.ui-panel{
+    position: absolute;
+    background: black;
+    backdrop-filter: blur(10px);
+    border: 3px solid blue;
+    padding: 10px;
+    border-radius: center;
+    box-shadow: 0 0 30px rgba(74, 158,255, 0.3);
+    z-index: 1000;
+    display: none;
+
+ }
+ .ui-panel.active {
+    display: block;
+ }
+ .ui-panel.active h1{
+    color: red;
+    margin-bottom: 20px;
+    font-size: 40px;
+
+ }*/
+ 
