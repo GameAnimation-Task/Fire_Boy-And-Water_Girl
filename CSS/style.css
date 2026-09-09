@@ -42,38 +42,43 @@ body {
   height: 100vh;
 }
 #instructionsMenu {
-  width: 100vw;
-  height: 100vh;
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../assest/instruction_image.png");
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background:
+        linear-gradient(
+            rgba(0, 0, 0, 0.6),
+            rgba(0, 0, 0, 0.6)
+        ),
+        url("../assest/instruction_image.png");
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: white;
-  text-align: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    text-align: center;
 }
 #instructionsMenu p {
-  font-size: 40px;
-  margin: 8px;
-  color: darkgoldenrod;
+    font-size: 40px;
+    margin: 8px;
+    color: darkgoldenrod;
 }
 
+ 
 #okButton {
-  width: 200px;
-  padding: 15px;
-  color: #8b6b28;
-  font-size: 22px;
-  text-shadow: 2px 2px 2px #5a3f12;
-  background: transparent;
-  border: none;
+    width: 200px;
+    padding: 15px;
+    color: #8B6B28;
+    font-size: 22px;
+    text-shadow: 2px 2px 2px #5A3F12;
+    background: transparent;
+    border: none;
 }
 #okButton:hover {
-  background: #eba709;
-  transform: scale(1.05);
+    background: #eba709;
+    transform: scale(1.05);
 }
+
