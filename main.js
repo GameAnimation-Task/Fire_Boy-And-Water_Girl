@@ -2,7 +2,7 @@ import Collision from "./collision.js";
 import Platform from "./platform.js";
 import Player from "./player.js";
 import Lake from "./lake.js";
-import Button from"./button.js";
+import Button from "./button.js";
 import Diamond from "./diamond.js";
 
 const canvas = document.getElementById("gameCanvas");
@@ -39,34 +39,35 @@ const blueDiamondImage = new Image();
 blueDiamondImage.src = "assest/diamonds_blue.png";
 
 const player = new Player(30, 790, 50, 60, fireboyImage, "fire");
-const watergirl = new Player(
-    100,
-    790,
-    50,
-    60,
-    watergirlImage,
-    "water"
-);
+const watergirl = new Player(100, 790, 50, 60, watergirlImage, "water");
 const redDiamonds = [
-    new Diamond(150, 800, 30, 30, redDiamondImage, "red"),
-    new Diamond(470, 260,30, 30, redDiamondImage, "red"),
-    new Diamond(1150, 460, 30, 30, redDiamondImage, "red")
+  new Diamond(150, 800, 30, 30, redDiamondImage, "red"),
+  new Diamond(470, 260, 30, 30, redDiamondImage, "red"),
+  new Diamond(1150, 460, 30, 30, redDiamondImage, "red"),
 ];
 
 const blueDiamonds = [
-    new Diamond(150, 430, 30, 30, blueDiamondImage, "blue"),
-    new Diamond(900, 700, 30, 30, blueDiamondImage, "blue"),
-    new Diamond(1400, 320, 30, 30, blueDiamondImage, "blue"),
-    new Diamond(170, 760, 30, 30, blueDiamondImage, "blue")
+  new Diamond(150, 430, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(900, 700, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(1400, 320, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(170, 760, 30, 30, blueDiamondImage, "blue"),
 ];
 
-const fireLake = new Lake(450, canvas.height - 620, 100, 40, flakeImage, "fire");
-const movingPlatform = new Platform(350, 820, 400, 50);
+const fireLake = new Lake(
+  450,
+  canvas.height - 620,
+  100,
+  40,
+  flakeImage,
+  "fire",
+);
+const movingPlatform = new Platform(350, 800, 400, 50);
 movingPlatform.previousY = movingPlatform.y;
-const button1 = new Button(220,850,60,20,buttonImage);
-const button2 = new Button(50,455,60,20,buttonImage);
-const button3 = new Button(810,730,60,20,buttonImage);
-const button4 = new Button(1200,490,60,20,buttonImage);
+const button1 = new Button(220, 850, 60, 20, buttonImage);
+const button2 = new Button(50, 455, 60, 20, buttonImage);
+const button3 = new Button(810, 730, 60, 20, buttonImage);
+const button4 = new Button(1200, 490, 60, 20, buttonImage);
+const buttons = [button1, button2, button3, button4];
 const platforms = [
   new Platform(0, 0, 1600, 35),
   new Platform(1315, 135, 255, 55),
@@ -87,108 +88,122 @@ const keys = {};
 const keys2 = {};
 
 window.addEventListener("keydown", function (event) {
-    if (event.key === "ArrowLeft" ||event.key === "ArrowRight" ||event.key === "ArrowUp") {
-        keys[event.key] = true;
-        event.preventDefault();
-    }
-    if ( event.key.toLowerCase() === "a" ||event.key.toLowerCase() === "d" ||
-    event.key.toLowerCase() === "w" ||event.key.toLowerCase() === "s") {
-        keys2[event.key.toLowerCase()] = true;
-        event.preventDefault();
-    }
+  if (
+    event.key === "ArrowLeft" ||
+    event.key === "ArrowRight" ||
+    event.key === "ArrowUp"
+  ) {
+    keys[event.key] = true;
+    event.preventDefault();
+  }
+  if (
+    event.key.toLowerCase() === "a" ||
+    event.key.toLowerCase() === "d" ||
+    event.key.toLowerCase() === "w" ||
+    event.key.toLowerCase() === "s"
+  ) {
+    keys2[event.key.toLowerCase()] = true;
+    event.preventDefault();
+  }
 });
 
 window.addEventListener("keyup", function (event) {
-    if (event.key === "ArrowLeft" ||event.key === "ArrowRight" ||event.key === "ArrowUp") {
-        keys[event.key] = false;
-    }
+  if (
+    event.key === "ArrowLeft" ||
+    event.key === "ArrowRight" ||
+    event.key === "ArrowUp"
+  ) {
+    keys[event.key] = false;
+  }
 
-    if (event.key.toLowerCase() === "a" ||event.key.toLowerCase() === "d" ||
-     event.key.toLowerCase() === "w" ||event.key.toLowerCase() === "s") {
-        keys2[event.key.toLowerCase()] = false;
-    }
+  if (
+    event.key.toLowerCase() === "a" ||
+    event.key.toLowerCase() === "d" ||
+    event.key.toLowerCase() === "w" ||
+    event.key.toLowerCase() === "s"
+  ) {
+    keys2[event.key.toLowerCase()] = false;
+  }
 });
 
 let lastTime = 0;
-const buttons = [button1, button2,button3,button4];
 
 function update(dt) {
-     
-    Collision.update(player,platforms,keys,GAME_WIDTH,GAME_HEIGHT,dt,{
-      left: "ArrowLeft",
-        right: "ArrowRight",
-        up: "ArrowUp"
-    });
-       Collision.update(watergirl, platforms, keys2, GAME_WIDTH, GAME_HEIGHT, dt, {
-    left: "a",
-    right: "d",
-    up: "w",
-  });
-    for (let button of buttons) {
-
-    const fireboyOnButton =
-        Collision.checkButtonCollision(player, button);
-
-    const watergirlOnButton =
-        Collision.checkButtonCollision(watergirl, button);
-
+  for (let button of buttons) {
+    const fireboyOnButton = Collision.checkButtonCollision(player, button);
+    const watergirlOnButton = Collision.checkButtonCollision(watergirl, button);
     button.pressed = fireboyOnButton || watergirlOnButton;
+  }
+  updateMovingPlatform(dt);
+
+  const allPlatforms = [...platforms, movingPlatform];
+  Collision.update(player, allPlatforms, keys, GAME_WIDTH, GAME_HEIGHT, dt, {
+    left: "ArrowLeft",
+    right: "ArrowRight",
+    up: "ArrowUp",
+  });
+  Collision.update(
+    watergirl,
+    allPlatforms,
+    keys2,
+    GAME_WIDTH,
+    GAME_HEIGHT,
+    dt,
+    {
+      left: "a",
+      right: "d",
+      up: "w",
+    },
+  );
+
+  Collision.checkDiamondCollision(player, redDiamonds, "red");
+  Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
 }
-    updateMovingPlatform(dt);
-    Collision.checkDiamondCollision(player,redDiamonds,"red");
-    Collision.checkDiamondCollision(watergirl,blueDiamonds,"blue");
 
-    
-}
+const originalY = 800;
+const targetY = 500;
 
-    const originalY = 820;
-    const targetY = 500;
+const speed = 200;
 
-    const speed = 200;
-    const oldY = movingPlatform.y;
-    const anyButtonPressed =button1.pressed || button2.pressed;
+function updateMovingPlatform(dt) {
+  const oldY = movingPlatform.y;
+  const anyButtonPressed = button1.pressed || button2.pressed;
 
-    if (anyButtonPressed) {
-        if (movingPlatform.y > targetY) {
-            movingPlatform.y -= speed * dt / 1000;
-            if (movingPlatform.y < targetY) {
-                movingPlatform.y = targetY;
-            }
-        }
-
-    } else {
-        if (movingPlatform.y < originalY) {
-            movingPlatform.y += speed * dt / 1000;
-            if (movingPlatform.y > originalY) {
-                movingPlatform.y = originalY;
-            }
-        }
+  if (anyButtonPressed) {
+    if (movingPlatform.y > targetY) {
+      movingPlatform.y -= (speed * dt) / 1000;
+      if (movingPlatform.y < targetY) {
+        movingPlatform.y = targetY;
+      }
     }
-     const dy = movingPlatform.y - oldY;
-     movePlayerWithPlatform(player, oldY, dy);
-     movePlayerWithPlatform(watergirl, oldY, dy);
-    function movePlayerWithPlatform(player, oldY, dy) {
-
-    const horizontalCollision =
-        player.x + player.width > movingPlatform.x &&
-        player.x < movingPlatform.x + movingPlatform.width;
-
-    const standingOnPlatform =
-        Math.abs((player.y + player.height) - oldY) < 8;
-
-    if (horizontalCollision && standingOnPlatform && player.velocityY >= 0) {
-
-        player.y += dy;
-
-        player.y = movingPlatform.y - player.height;
-
-        player.velocityY = 0;
-
-        player.onGround = true;
+  } else {
+    if (movingPlatform.y < originalY) {
+      movingPlatform.y += (speed * dt) / 1000;
+      if (movingPlatform.y > originalY) {
+        movingPlatform.y = originalY;
+      }
     }
+  }
+  const dy = movingPlatform.y - oldY;
+  movePlayerWithPlatform(player, oldY, dy);
+  movePlayerWithPlatform(watergirl, oldY, dy);
 }
+function movePlayerWithPlatform(player, oldY, dy) {
+  const horizontalCollision =
+    player.x + player.width > movingPlatform.x &&
+    player.x < movingPlatform.x + movingPlatform.width;
 
+  const standingOnPlatform = Math.abs(player.y + player.height - oldY) < 8;
 
+  if (horizontalCollision && standingOnPlatform && player.velocityY >= 0) {
+    player.y += dy;
+
+    player.y = movingPlatform.y - player.height;
+
+    player.velocityY = 0;
+
+    player.onGround = true;
+  }
 }
 
 function draw(time) {
@@ -196,16 +211,18 @@ function draw(time) {
   for (let platform of platforms) {
     platform.draw(ctx);
   }
-  for (let button of buttons) {
-        button.draw(ctx);
-    }
-    for (let diamond of redDiamonds) {
-        diamond.draw(ctx);
-    }
+  movingPlatform.draw(ctx);
 
-    for (let diamond of blueDiamonds) {
-        diamond.draw(ctx);
-    }
+  for (let button of buttons) {
+    button.draw(ctx);
+  }
+  for (let diamond of redDiamonds) {
+    diamond.draw(ctx);
+  }
+
+  for (let diamond of blueDiamonds) {
+    diamond.draw(ctx);
+  }
   fireLake.update(time);
   fireLake.draw(ctx);
   player.draw(ctx);
