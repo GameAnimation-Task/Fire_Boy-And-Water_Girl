@@ -45,8 +45,6 @@ export default class Player {
     this.image = image;
 
     this.facing = 1;
-
-    // Pick the frame set that matches this character's sprite sheet.
     this.animations = FRAME_DATA[type];
     if (!this.animations) {
       throw new Error(

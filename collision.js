@@ -1,23 +1,19 @@
 class Collision {
-  static update(
-    player,
-    platforms,
-    keys,
-    GAME_WIDTH,
-    GAME_HEIGHT,
-    dt = 16.67,
-    keyMap = { left: "ArrowLeft", right: "ArrowRight", up: "ArrowUp" },
-  ) {
+  static update(player, platforms, keys, GAME_WIDTH, GAME_HEIGHT, dt = 16.67,controls = {
+        left: "ArrowLeft",
+        right: "ArrowRight",
+        up: "ArrowUp"
+    }) {
     const previousX = player.x;
     let moving = false;
 
-    if (keys[keyMap.left]) {
+    if (keys[controls.left]) {
       player.x -= player.speed;
       player.facing = -1;
       moving = true;
     }
 
-    if (keys[keyMap.right]) {
+    if (keys[controls.right]) {
       player.x += player.speed;
       player.facing = 1;
       moving = true;
@@ -78,9 +74,9 @@ class Collision {
       }
     }
 
-    if (keys[keyMap.up] && player.onGround) {
+    if (keys[controls.up] && player.onGround) {
       player.velocityY = player.jumpPower;
-      player.onGround = false;
+       player.onGround = false;
     }
 
     if (player.x < 0) {
@@ -92,7 +88,7 @@ class Collision {
     }
     if (player.y + player.height > GAME_HEIGHT) {
       player.y = GAME_HEIGHT - player.height;
-      player.velocityY = 0;
+       player.velocityY = 0;
       player.onGround = true;
     }
 
@@ -105,6 +101,27 @@ class Collision {
       player.y < button.y + button.height &&
       player.y + player.height > button.y
     );
-  }
+}
+static checkDiamondCollision(player, diamonds, type) {
+
+    for (let i = diamonds.length - 1; i >= 0; i--) {
+        const diamond = diamonds[i];
+        if (diamond.type !== type) {
+            continue;
+        }
+
+        const collision =
+            player.x < diamond.x + diamond.width &&
+            player.x + player.width > diamond.x &&
+            player.y < diamond.y + diamond.height &&
+            player.y + player.height > diamond.y;
+
+        if (collision) {
+            diamonds.splice(i, 1);
+        }
+    }
+}   
+    
+   
 }
 export default Collision;
