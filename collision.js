@@ -1,16 +1,23 @@
-
 class Collision {
-  static update(player, platforms, keys, GAME_WIDTH, GAME_HEIGHT, dt = 16.67) {
+  static update(
+    player,
+    platforms,
+    keys,
+    GAME_WIDTH,
+    GAME_HEIGHT,
+    dt = 16.67,
+    keyMap = { left: "ArrowLeft", right: "ArrowRight", up: "ArrowUp" },
+  ) {
     const previousX = player.x;
     let moving = false;
 
-    if (keys["ArrowLeft"]) {
+    if (keys[keyMap.left]) {
       player.x -= player.speed;
       player.facing = -1;
       moving = true;
     }
 
-    if (keys["ArrowRight"]) {
+    if (keys[keyMap.right]) {
       player.x += player.speed;
       player.facing = 1;
       moving = true;
@@ -71,7 +78,7 @@ class Collision {
       }
     }
 
-    if (keys["ArrowUp"] && player.onGround) {
+    if (keys[keyMap.up] && player.onGround) {
       player.velocityY = player.jumpPower;
       player.onGround = false;
     }
@@ -91,16 +98,5 @@ class Collision {
 
     player.animate(moving, dt);
   }
-  static checkButtonCollision(player, button) {
-
-    return(
-        player.x < button.x + button.width 
-        &&player.x + player.width > button.x &&
-        player.y < button.y + button.height
-        &&player.y + player.height > button.y
-    );
-    
-}
-   
 }
 export default Collision;

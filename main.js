@@ -1,9 +1,8 @@
-
 import Collision from "./collision.js";
 import Platform from "./platform.js";
 import Player from "./player.js";
 import Lake from "./lake.js";
-import Button from"./button.js";
+import Button from "./button.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -20,6 +19,8 @@ const okButton = document.getElementById("okButton");
 
 const fireboyImage = new Image();
 fireboyImage.src = "assest/fire.png";
+const watergirlImage = new Image();
+watergirlImage.src = "assest/wgirl.png";
 
 const backgroundImage = new Image();
 backgroundImage.src = "assest/bg.png";
@@ -31,24 +32,13 @@ flakeImage.src = "assest/lakef3.png";
 const buttonImage = new Image();
 buttonImage.src = "assest/Buttom1.png";
 
-const player = new Player(30, 790, 50, 60, fireboyImage, "fire");
+const fireboy = new Player(30, 790, 50, 60, fireboyImage, "fire");
+const watergirl = new Player(90, 790, 50, 60, watergirlImage, "water");
 
-const fireLake = new Lake(450, canvas.height - 620, 100, 40, flakeImage, "fire");
+const fireLake = new Lake(310, canvas.height - 40, 100, 40, flakeImage, "fire");
 const movingPlatform = new Platform(410, 820, 300, 50);
-const button1 = new Button(
-    220,
-    850,
-    60,
-    20,
-    buttonImage
-);
-const button2 = new Button(
-    50,
-    455,
-    60,
-    20,
-    buttonImage
-);
+const button1 = new Button(220, 850, 60, 20, buttonImage);
+const button2 = new Button(50, 455, 60, 20, buttonImage);
 const platforms = [
   new Platform(0, 0, 1600, 35),
   new Platform(1315, 135, 255, 55),
@@ -61,9 +51,8 @@ const platforms = [
   new Platform(990, 620, 145, 50),
   new Platform(0, 650, 205, 45),
   new Platform(765, 750, 180, 50),
-  
+  new Platform(410, 850, 300, 50),
   new Platform(0, 870, 1600, 30),
-  movingPlatform,
 ];
 
 const keys = {};
@@ -76,55 +65,49 @@ window.addEventListener("keyup", function (event) {
 
 let lastTime = 0;
 const buttons = [button1, button2];
-
 function update(dt) {
+  Collision.update(fireboy, platforms, keys, GAME_WIDTH, GAME_HEIGHT, dt, {
+    left: "ArrowLeft",
+    right: "ArrowRight",
+    up: "ArrowUp",
+  });
+  Collision.update(watergirl, platforms, keys, GAME_WIDTH, GAME_HEIGHT, dt, {
+    left: "a",
+    right: "d",
+    up: "w",
+  });
+  for (let button of buttons) {
+    button.pressed =
+      Collision.checkButtonCollision(fireboy, button) ||
+      Collision.checkButtonCollision(watergirl, button);
+  }
 
-    Collision.update(
-        player,
-        platforms,
-        keys,
-        GAME_WIDTH,
-        GAME_HEIGHT,
-        dt
-    );
-
-    for (let button of buttons) {
-        button.pressed = Collision.checkButtonCollision(
-            player,
-            button
-        );
-    }
-
-    updateMovingPlatform(dt);
+  updateMovingPlatform(dt);
 }
-  
+
 function updateMovingPlatform(dt) {
+  const originalY = 820;
+  const targetY = 500;
 
-    const originalY = 820;
-    const targetY = 500;
+  const speed = 200;
+  const anyButtonPressed = button1.pressed || button2.pressed;
 
-    const speed = 200;
-    const anyButtonPressed =
-        button1.pressed || button2.pressed;
-
-    if (anyButtonPressed) {
-        if (movingPlatform.y > targetY) {
-            movingPlatform.y -= speed * dt / 1000;
-            if (movingPlatform.y < targetY) {
-                movingPlatform.y = targetY;
-            }
-        }
-
-    } else {
-        if (movingPlatform.y < originalY) {
-            movingPlatform.y += speed * dt / 1000;
-            if (movingPlatform.y > originalY) {
-                movingPlatform.y = originalY;
-            }
-        }
+  if (anyButtonPressed) {
+    if (movingPlatform.y > targetY) {
+      movingPlatform.y -= (speed * dt) / 1000;
+      if (movingPlatform.y < targetY) {
+        movingPlatform.y = targetY;
+      }
     }
+  } else {
+    if (movingPlatform.y < originalY) {
+      movingPlatform.y += (speed * dt) / 1000;
+      if (movingPlatform.y > originalY) {
+        movingPlatform.y = originalY;
+      }
+    }
+  }
 }
-
 
 function draw(time) {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
@@ -132,11 +115,12 @@ function draw(time) {
     platform.draw(ctx);
   }
   for (let button of buttons) {
-        button.draw(ctx);
-    }
+    button.draw(ctx);
+  }
   fireLake.update(time);
   fireLake.draw(ctx);
-  player.draw(ctx);
+  fireboy.draw(ctx);
+  watergirl.draw(ctx);
 }
 
 function animate(time) {
