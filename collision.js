@@ -98,5 +98,13 @@ class Collision {
 
     player.animate(moving, dt);
   }
+  static checkButtonCollision(player, button) {
+    return (
+      player.x < button.x + button.width &&
+      player.x + player.width > button.x &&
+      player.y < button.y + button.height &&
+      player.y + player.height > button.y
+    );
+  }
 }
 export default Collision;
