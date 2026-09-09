@@ -19,21 +19,31 @@ body {
     background-repeat: no-repeat;
     color: white;
 }
+#mainMenu button {
+    width: 250px;
+    padding: 15px;
+    margin: 10px;
+    font-size: 22px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #04580e;
+    color: white;
+}
+#mainMenu button:hover {
+    background: #9de63f;
+    transform: scale(1.05);
+}
 
 #gameCanvas {
   display: block;
   width: 100vw;
   height: 100vh;
 }
-/*.ui-panel{
-    position: absolute;
-    background: black;
-    backdrop-filter: blur(10px);
-    border: 3px solid blue;
-    padding: 10px;
-    border-radius: center;
-    box-shadow: 0 0 30px rgba(74, 158,255, 0.3);
-    z-index: 1000;
+#instructionsMenu {
+    width: 100vw;
+    height: 100vh;
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -45,7 +55,7 @@ body {
         ),
         url("../assest/instruction_image.png");
 
-    background-size: fit;
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     color: white;
@@ -57,7 +67,7 @@ body {
     color: darkgoldenrod;
 }
 
- }*/
+ 
 #okButton {
     width: 200px;
     padding: 15px;
