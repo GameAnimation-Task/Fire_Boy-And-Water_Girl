@@ -1,4 +1,3 @@
-
 import Collision from "./collision.js";
 import Platform from "./platform.js";
 import Player from "./player.js";
@@ -80,9 +79,8 @@ const platforms = [
   new Platform(990, 620, 145, 50),
   new Platform(0, 650, 205, 45),
   new Platform(765, 750, 180, 50),
-  
+  new Platform(410, 850, 300, 50),
   new Platform(0, 870, 1600, 30),
-  movingPlatform,
 ];
 
 const keys = {};
@@ -142,8 +140,6 @@ function update(dt) {
 
     
 }
-  
-function updateMovingPlatform(dt) {
 
     const originalY = 820;
     const targetY = 500;
@@ -194,7 +190,6 @@ function updateMovingPlatform(dt) {
 
 
 }
-
 
 function draw(time) {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);

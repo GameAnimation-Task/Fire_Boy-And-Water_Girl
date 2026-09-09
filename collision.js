@@ -1,4 +1,3 @@
-
 class Collision {
   static update(player, platforms, keys, GAME_WIDTH, GAME_HEIGHT, dt = 16.67,controls = {
         left: "ArrowLeft",
@@ -96,12 +95,11 @@ class Collision {
     player.animate(moving, dt);
   }
   static checkButtonCollision(player, button) {
-
-    return(
-        player.x < button.x + button.width 
-        &&player.x + player.width > button.x &&
-        player.y < button.y + button.height
-        &&player.y + player.height > button.y
+    return (
+      player.x < button.x + button.width &&
+      player.x + player.width > button.x &&
+      player.y < button.y + button.height &&
+      player.y + player.height > button.y
     );
 }
 static checkDiamondCollision(player, diamonds, type) {
