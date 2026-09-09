@@ -1,5 +1,5 @@
+import Collision from "./collision.js";
 const canvas = document.getElementById("gameCanvas");
-console.log("CANVAS", canvas);
 const ctx = canvas.getContext("2d");
 const GAME_WIDTH = 1600;
 const GAME_HEIGHT = 900;
@@ -176,49 +176,7 @@ window.addEventListener("keyup", function (event) {
 });
 
 function update() {
-  if (keys["ArrowLeft"]) {
-    player.x -= player.speed;
-  }
-  if (keys["ArrowRight"]) {
-    player.x += player.speed;
-  }
-  player.velocityY += player.gravity;
-  player.y += player.velocityY;
-  player.onGround = false;
-
-  for (let platform of platforms) {
-    const playerLeft = player.x;
-    const playerRight = player.x + player.width;
-    const playerTop = player.y;
-    const playerBottom = player.y + player.height;
-    const previousBottom = playerBottom - player.velocityY;
-    const horizontalCollision =
-      playerRight > platform.x && playerLeft < platform.x + platform.width;
-
-    if (
-      horizontalCollision &&
-      player.velocityY >= 0 &&
-      previousBottom <= platform.y &&
-      playerBottom >= platform.y
-    ) {
-      player.y = platform.y - player.height;
-      player.velocityY = 0;
-      player.onGround = true;
-    }
-  }
-
-  if (keys["ArrowUp"] && player.onGround) {
-    player.velocityY = player.jumpPower;
-
-    player.onGround = false;
-  }
-
-  if (player.x < 0) {
-    player.x = 0;
-  }
-  if (player.x + player.width > GAME_WIDTH) {
-    player.x = GAME_WIDTH - player.width;
-  }
+    Collision.update(player,platforms,keys,GAME_WIDTH,GAME_HEIGHT);
 }
 
 function drawPlayer() {
