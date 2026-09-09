@@ -1,7 +1,10 @@
-
-body{
-    background:white;
-   
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  overflow: hidden;
 }
 #mainMenu {
     width: 100vw;
@@ -17,25 +20,20 @@ body{
     color: white;
 }
 
-#mainMenu button {
-    width: 250px;
-    padding: 15px;
-    margin: 10px;
-    font-size: 22px;
-    font-weight: bold;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    background: #04580e;
-    color: white;
+#gameCanvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
 }
-#mainMenu button:hover {
-    background: #9de63f;
-    transform: scale(1.05);
-}
-#instructionsMenu {
-    width: 100vw;
-    height: 100vh;
+/*.ui-panel{
+    position: absolute;
+    background: black;
+    backdrop-filter: blur(10px);
+    border: 3px solid blue;
+    padding: 10px;
+    border-radius: center;
+    box-shadow: 0 0 30px rgba(74, 158,255, 0.3);
+    z-index: 1000;
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -59,6 +57,7 @@ body{
     color: darkgoldenrod;
 }
 
+ }*/
 #okButton {
     width: 200px;
     padding: 15px;
@@ -72,13 +71,4 @@ body{
     background: #eba709;
     transform: scale(1.05);
 }
-#gameCanvas {
-    display: none;
-    border: 5px solid black;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(90vw, 900px);
-    height: auto;
-}
+
