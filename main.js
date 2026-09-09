@@ -168,25 +168,28 @@ function update(dt) {
      movePlayerWithPlatform(player, oldY, dy);
      movePlayerWithPlatform(watergirl, oldY, dy);
     function movePlayerWithPlatform(player, oldY, dy) {
-
-    const horizontalCollision =
+        const horizontalCollision =
         player.x + player.width > movingPlatform.x &&
         player.x < movingPlatform.x + movingPlatform.width;
 
-    const standingOnPlatform =
+        const standingOnPlatform =
         Math.abs((player.y + player.height) - oldY) < 8;
 
-    if (horizontalCollision && standingOnPlatform && player.velocityY >= 0) {
-
-        player.y += dy;
+        if (horizontalCollision && standingOnPlatform && player.velocityY >= 0) {
+            player.y += dy;
 
         player.y = movingPlatform.y - player.height;
 
         player.velocityY = 0;
 
         player.onGround = true;
+       }
     }
-}
+
+        
+
+    
+  
 
 
 }
