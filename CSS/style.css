@@ -7,33 +7,33 @@ body {
   overflow: hidden;
 }
 #mainMenu {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-image: url("../assest/menu_image.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    color: white;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: url("../assest/menu_image.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
 }
 #mainMenu button {
-    width: 250px;
-    padding: 15px;
-    margin: 10px;
-    font-size: 22px;
-    font-weight: bold;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    background: #04580e;
-    color: white;
+  width: 250px;
+  padding: 15px;
+  margin: 10px;
+  font-size: 22px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #04580e;
+  color: white;
 }
 #mainMenu button:hover {
-    background: #9de63f;
-    transform: scale(1.05);
+  background: #9de63f;
+  transform: scale(1.05);
 }
 
 #gameCanvas {
