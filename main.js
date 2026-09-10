@@ -23,11 +23,77 @@ fireboyImage.src = "assest/fire.png";
 const watergirlImage = new Image();
 watergirlImage.src = "assest/wgirl.png";
 
+const fireDoorImage = new Image();
+fireDoorImage.src = "assest/fire door1.png";
+
+const waterDoorImage = new Image();
+waterDoorImage.src = "assest/water_door1.png";
+
 const backgroundImage = new Image();
 backgroundImage.src = "assest/bg.png";
 canvas.style.backgroundSize = "cover";
 canvas.style.backgroundPosition = "center";
 
+const fireDoor = {
+  x: 1360,
+  y: 35,
+  width: 70,
+  height: 100,
+  frame: 0,
+  maxFrame: 17,
+};
+
+const waterDoor = {
+  x: 1480,
+  y: 45,
+  width: 70,
+  height: 90,
+  frame: 0,
+  maxFrame: 17,
+};
+let gameWon = false;
+let fireboyAtDoor = false;
+let watergirlAtDoor = false;
+
+function drawDoor(door, image, frameCount) {
+  if (!image.complete || image.width === 0) return;
+  const frameWidth = image.width / frameCount;
+  const currentFrame = Math.floor(door.frame);
+  ctx.drawImage(
+    image,
+    frameWidth * door.frame,
+    0,
+    frameWidth,
+    image.height,
+    door.x,
+    door.y,
+    door.width,
+    door.height,
+  );
+}
+function checkDoorCollision(player, door) {
+  const doorEntrance = {
+    x: door.x,
+    y: door.y + door.height - 30,
+    width: door.width,
+    height: 40,
+  };
+  return (
+    player.x < door.x + door.width &&
+    player.x + player.width > door.x &&
+    player.y < door.y + door.height &&
+    player.y + player.height > door.y
+  );
+}
+function updateDoorAnimation(door, playerAtDoor, dt) {
+  if (playerAtDoor) {
+    door.frame += dt / 100;
+
+    if (door.frame > door.maxFrame) {
+      door.frame = door.maxFrame;
+    }
+  }
+}
 const buttonImage = new Image();
 buttonImage.src = "assest/Buttom1.png";
 const redDiamondImage = new Image();
@@ -65,7 +131,7 @@ const platforms = [
   new Platform(0, 0, 1600, 35),
   new Platform(1315, 135, 255, 55),
   new Platform(1080, 290, 190, 50),
-  
+
   new Platform(0, 490, 255, 50),
   new Platform(300, 340, 420, 40),
   new Platform(710, 465, 55, 430),
@@ -90,9 +156,6 @@ const waterLake = {
 };
 
 const lakes = [fireLake, waterLake];
-
-
- 
 
 const keys = {};
 const keys2 = {};
@@ -212,131 +275,130 @@ function update(dt) {
     checkLakeCollision();
 }
 
-const originalY = 830;
-const targetY = 500;
+  for (let button of buttons) {
+    const fireboyOnButton = Collision.checkButtonCollision(player, button);
 
-const speed = 200;
+    const watergirlOnButton = Collision.checkButtonCollision(watergirl, button);
+
+    button.pressed = fireboyOnButton || watergirlOnButton;
+  }
+  updateMovingPlatform(dt);
+
+  Collision.checkDiamondCollision(player, redDiamonds, "red");
+
+  Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
+
+  if (!fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
+    fireboyAtDoor = true;
+  }
+
+  if (!watergirlAtDoor && checkDoorCollision(watergirl, waterDoor)) {
+    watergirlAtDoor = true;
+  }
+  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
+  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
+
+  const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
+
+  const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
+  if (
+    allRedCollected &&
+    !fireboyAtDoor &&
+    checkDoorCollision(player, fireDoor)
+  ) {
+    fireboyAtDoor = true;
+  }
+
+  if (
+    allBlueCollected &&
+    !watergirlAtDoor &&
+    checkDoorCollision(watergirl, waterDoor)
+  ) {
+    watergirlAtDoor = true;
+  }
+
+  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
+
+  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
+
+  if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
+    gameWon = true;
+  }
+}
 
 function updateMovingPlatform(dt) {
-    const oldY1 = movingPlatform.y;
+  const oldY1 = movingPlatform.y;
 
-    const buttonForPlatform1 =
-        button1.pressed || button2.pressed;
+  const buttonForPlatform1 = button1.pressed || button2.pressed;
 
-    const originalY1 = 830;
-    const targetY1 = 500;
-    const speed1 = 200;
+  const originalY1 = 830;
+  const targetY1 = 500;
+  const speed1 = 200;
 
-    if (buttonForPlatform1) {
+  if (buttonForPlatform1) {
+    if (movingPlatform.y > targetY1) {
+      movingPlatform.y -= (speed1 * dt) / 1000;
 
-        if (movingPlatform.y > targetY1) {
-
-            movingPlatform.y -= speed1 * dt / 1000;
-
-            if (movingPlatform.y < targetY1) {
-                movingPlatform.y = targetY1;
-            }
-        }
-
-    } else {
-
-        if (movingPlatform.y < originalY1) {
-
-            movingPlatform.y += speed1 * dt / 1000;
-
-            if (movingPlatform.y > originalY1) {
-                movingPlatform.y = originalY1;
-            }
-        }
+      if (movingPlatform.y < targetY1) {
+        movingPlatform.y = targetY1;
+      }
     }
+  } else {
+    if (movingPlatform.y < originalY1) {
+      movingPlatform.y += (speed1 * dt) / 1000;
 
-    const dy1 = movingPlatform.y - oldY1;
-
-    movePlayerWithPlatform(
-        player,
-        movingPlatform,
-        oldY1,
-        dy1
-    );
-
-    movePlayerWithPlatform(
-        watergirl,
-        movingPlatform,
-        oldY1,
-        dy1
-    );
-
-    const oldY2 = movingPlatform2.y;
-
-    const buttonForPlatform2 =
-        button3.pressed || button4.pressed;
-
-    const originalY2 = 820;
-    const targetY2 = 300;
-    const speed2 = 200;
-
-    if (buttonForPlatform2) {
-
-        if (movingPlatform2.y > targetY2) {
-
-            movingPlatform2.y -= speed2 * dt / 1000;
-
-            if (movingPlatform2.y < targetY2) {
-                movingPlatform2.y = targetY2;
-            }
-        }
-
-    } else {
-
-        if (movingPlatform2.y < originalY2) {
-
-            movingPlatform2.y += speed2 * dt / 1000;
-
-            if (movingPlatform2.y > originalY2) {
-                movingPlatform2.y = originalY2;
-            }
-        }
+      if (movingPlatform.y > originalY1) {
+        movingPlatform.y = originalY1;
+      }
     }
+  }
 
-    const dy2 = movingPlatform2.y - oldY2;
+  const dy1 = movingPlatform.y - oldY1;
 
-    movePlayerWithPlatform(
-        player,
-        movingPlatform2,
-        oldY2,
-        dy2
-    );
+  movePlayerWithPlatform(player, movingPlatform, oldY1, dy1);
 
-    movePlayerWithPlatform(
-        watergirl,
-        movingPlatform2,
-        oldY2,
-        dy2
-    );
+  movePlayerWithPlatform(watergirl, movingPlatform, oldY1, dy1);
+
+  const oldY2 = movingPlatform2.y;
+
+  const buttonForPlatform2 = button3.pressed || button4.pressed;
+
+  const originalY2 = 820;
+  const targetY2 = 300;
+  const speed2 = 200;
+
+  if (buttonForPlatform2) {
+    if (movingPlatform2.y > targetY2) {
+      movingPlatform2.y -= (speed2 * dt) / 1000;
+
+      if (movingPlatform2.y < targetY2) {
+        movingPlatform2.y = targetY2;
+      }
+    }
+  } else {
+    if (movingPlatform2.y < originalY2) {
+      movingPlatform2.y += (speed2 * dt) / 1000;
+
+      if (movingPlatform2.y > originalY2) {
+        movingPlatform2.y = originalY2;
+      }
+    }
+  }
+
+  const dy2 = movingPlatform2.y - oldY2;
+
+  movePlayerWithPlatform(player, movingPlatform2, oldY2, dy2);
+
+  movePlayerWithPlatform(watergirl, movingPlatform2, oldY2, dy2);
 }
-function movePlayerWithPlatform(
-    player,
-    platform,
-    oldY,
-    dy
-) {
+function movePlayerWithPlatform(player, platform, oldY, dy) {
+  const horizontalCollision =
+    player.x + player.width > platform.x &&
+    player.x < platform.x + platform.width;
 
-    const horizontalCollision =
-        player.x + player.width > platform.x &&
-        player.x < platform.x + platform.width;
+  const standingOnPlatform = Math.abs(player.y + player.height - oldY) < 8;
 
-    const standingOnPlatform =
-        Math.abs(
-            player.y + player.height - oldY
-        ) < 8;
-
-    if (
-        horizontalCollision &&
-        standingOnPlatform &&
-        player.onGround
-    ) {
-
-  
+  if (horizontalCollision && standingOnPlatform && player.onGround) {
     player.y += dy;
 
     player.y = platform.y - player.height;
@@ -345,6 +407,28 @@ function movePlayerWithPlatform(
 
     player.onGround = true;
   }
+}
+
+function drawWinScreen() {
+  ctx.save();
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+
+  ctx.font = "bold 70px sans-serif";
+  ctx.fillText("YOU WIN!", canvas.width / 2, canvas.height / 2 - 30);
+
+  ctx.font = "28px sans-serif";
+  ctx.fillText(
+    "Both players reached their doors!",
+    canvas.width / 2,
+    canvas.height / 2 + 30,
+  );
+
+  ctx.restore();
 }
 
 function draw(time) {
@@ -382,6 +466,11 @@ function draw(time) {
   }
   player.draw(ctx);
   watergirl.draw(ctx);
+  drawDoor(fireDoor, fireDoorImage, 18);
+  drawDoor(waterDoor, waterDoorImage, 18);
+  if (gameWon) {
+    drawWinScreen();
+  }
 }
 
 function animate(time) {
@@ -389,7 +478,9 @@ function animate(time) {
   lastTime = time;
   update(dt);
   draw(time);
-  requestAnimationFrame(animate);
+  if (!gameWon) {
+    requestAnimationFrame(animate);
+  }
 }
 
 instructionsButton.addEventListener("click", function () {
