@@ -1,6 +1,7 @@
 import Collision from "./collision.js";
 import Platform from "./platform.js";
 import Player from "./player.js";
+
 import Button from "./button.js";
 import Diamond from "./diamond.js";
 
@@ -107,13 +108,14 @@ const redDiamonds = [
   new Diamond(150, 800, 30, 30, redDiamondImage, "red"),
   new Diamond(470, 260, 30, 30, redDiamondImage, "red"),
   new Diamond(1110, 260, 30, 30, redDiamondImage, "red"),
+  new Diamond(1130, 820, 30, 30, redDiamondImage, "red"),
 ];
 
 const blueDiamonds = [
   new Diamond(150, 430, 30, 30, blueDiamondImage, "blue"),
   new Diamond(900, 700, 30, 30, blueDiamondImage, "blue"),
-  new Diamond(1400, 280, 30, 30, blueDiamondImage, "blue"),
-  new Diamond(170, 760, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(1250, 820, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(180, 760, 30, 30, blueDiamondImage, "blue"),
 ];
 
 const movingPlatform = new Platform(350, 830, 400, 50);
@@ -137,6 +139,23 @@ const platforms = [
   new Platform(765, 750, 180, 50),
   new Platform(0, 870, 1600, 30),
 ];
+const fireLake = {
+    x: 1120,
+    y: 860,
+    width: 100,
+    height: 20,
+    color: "red"
+};
+
+const waterLake = {
+    x: 1250,
+    y: 860,
+    width: 100,
+    height: 20,
+    color: "blue"
+};
+
+const lakes = [fireLake, waterLake];
 
 const keys = {};
 const keys2 = {};
@@ -181,29 +200,80 @@ window.addEventListener("keyup", function (event) {
 });
 
 let lastTime = 0;
+function checkLakeCollision() {
+
+    for (let lake of lakes) {
+
+        const fireboyCollision =
+            player.x < lake.x + lake.width &&
+            player.x + player.width > lake.x &&
+            player.y < lake.y + lake.height &&
+            player.y + player.height > lake.y;
+
+        const watergirlCollision =
+            watergirl.x < lake.x + lake.width &&
+            watergirl.x + watergirl.width > lake.x &&
+            watergirl.y < lake.y + lake.height &&
+            watergirl.y + watergirl.height > lake.y;
+
+        if (lake.color === "red" && watergirlCollision) {
+            watergirl.visible = false;
+        }
+        if (lake.color === "blue" && fireboyCollision) {
+            player.visible = false;
+        }
+    }
+}
 
 function update(dt) {
-  const allPlatforms = [...platforms, movingPlatform, movingPlatform2];
+    const allPlatforms = [...platforms, movingPlatform,movingPlatform2];
 
-  Collision.update(player, allPlatforms, keys, GAME_WIDTH, GAME_HEIGHT, dt, {
-    left: "ArrowLeft",
-    right: "ArrowRight",
-    up: "ArrowUp",
-  });
+    if(player.visible){
+        Collision.update(player,allPlatforms,keys,GAME_WIDTH,GAME_HEIGHT,dt,
+        {
+            left: "ArrowLeft",
+            right: "ArrowRight",
+            up: "ArrowUp"
+        }
+      );
+    }
 
-  Collision.update(
-    watergirl,
-    allPlatforms,
-    keys2,
-    GAME_WIDTH,
-    GAME_HEIGHT,
-    dt,
-    {
-      left: "a",
-      right: "d",
-      up: "w",
-    },
-  );
+    if(watergirl.visible){
+        Collision.update(watergirl,allPlatforms,keys2,GAME_WIDTH,GAME_HEIGHT,dt,
+        {
+            left: "a",
+            right: "d",
+            up: "w"
+        }
+    );
+    }
+
+    for (let button of buttons) {
+
+        const fireboyOnButton =
+            Collision.checkButtonCollision(player, button);
+
+        const watergirlOnButton =
+            Collision.checkButtonCollision(watergirl, button);
+
+        button.pressed =
+            fireboyOnButton || watergirlOnButton;
+    }
+    updateMovingPlatform(dt);
+
+    Collision.checkDiamondCollision(
+        player,
+        redDiamonds,
+        "red"
+    );
+
+    Collision.checkDiamondCollision(
+        watergirl,
+        blueDiamonds,
+        "blue"
+    );
+    checkLakeCollision();
+}
 
   for (let button of buttons) {
     const fireboyOnButton = Collision.checkButtonCollision(player, button);
@@ -368,6 +438,21 @@ function draw(time) {
   }
   movingPlatform.draw(ctx);
   movingPlatform2.draw(ctx);
+     ctx.fillStyle = "red";
+    ctx.fillRect(
+        fireLake.x,
+        fireLake.y,
+        fireLake.width,
+        fireLake.height
+    );
+
+    ctx.fillStyle = "blue";
+    ctx.fillRect(
+        waterLake.x,
+        waterLake.y,
+        waterLake.width,
+        waterLake.height
+    );
 
   for (let button of buttons) {
     button.draw(ctx);
@@ -379,7 +464,6 @@ function draw(time) {
   for (let diamond of blueDiamonds) {
     diamond.draw(ctx);
   }
-
   player.draw(ctx);
   watergirl.draw(ctx);
   drawDoor(fireDoor, fireDoorImage, 18);
