@@ -140,19 +140,19 @@ const platforms = [
   new Platform(0, 870, 1600, 30),
 ];
 const fireLake = {
-    x: 1120,
-    y: 860,
-    width: 100,
-    height: 20,
-    color: "red"
+  x: 1120,
+  y: 860,
+  width: 100,
+  height: 20,
+  color: "red",
 };
 
 const waterLake = {
-    x: 1250,
-    y: 860,
-    width: 100,
-    height: 20,
-    color: "blue"
+  x: 1250,
+  y: 860,
+  width: 100,
+  height: 20,
+  color: "blue",
 };
 
 const lakes = [fireLake, waterLake];
@@ -201,79 +201,54 @@ window.addEventListener("keyup", function (event) {
 
 let lastTime = 0;
 function checkLakeCollision() {
+  for (let lake of lakes) {
+    const fireboyCollision =
+      player.x < lake.x + lake.width &&
+      player.x + player.width > lake.x &&
+      player.y < lake.y + lake.height &&
+      player.y + player.height > lake.y;
 
-    for (let lake of lakes) {
+    const watergirlCollision =
+      watergirl.x < lake.x + lake.width &&
+      watergirl.x + watergirl.width > lake.x &&
+      watergirl.y < lake.y + lake.height &&
+      watergirl.y + watergirl.height > lake.y;
 
-        const fireboyCollision =
-            player.x < lake.x + lake.width &&
-            player.x + player.width > lake.x &&
-            player.y < lake.y + lake.height &&
-            player.y + player.height > lake.y;
-
-        const watergirlCollision =
-            watergirl.x < lake.x + lake.width &&
-            watergirl.x + watergirl.width > lake.x &&
-            watergirl.y < lake.y + lake.height &&
-            watergirl.y + watergirl.height > lake.y;
-
-        if (lake.color === "red" && watergirlCollision) {
-            watergirl.visible = false;
-        }
-        if (lake.color === "blue" && fireboyCollision) {
-            player.visible = false;
-        }
+    if (lake.color === "red" && watergirlCollision) {
+      watergirl.visible = false;
     }
+    if (lake.color === "blue" && fireboyCollision) {
+      player.visible = false;
+    }
+  }
 }
 
 function update(dt) {
-    const allPlatforms = [...platforms, movingPlatform,movingPlatform2];
+  const allPlatforms = [...platforms, movingPlatform, movingPlatform2];
 
-    if(player.visible){
-        Collision.update(player,allPlatforms,keys,GAME_WIDTH,GAME_HEIGHT,dt,
-        {
-            left: "ArrowLeft",
-            right: "ArrowRight",
-            up: "ArrowUp"
-        }
-      );
-    }
+  if (player.visible) {
+    Collision.update(player, allPlatforms, keys, GAME_WIDTH, GAME_HEIGHT, dt, {
+      left: "ArrowLeft",
+      right: "ArrowRight",
+      up: "ArrowUp",
+    });
+  }
 
-    if(watergirl.visible){
-        Collision.update(watergirl,allPlatforms,keys2,GAME_WIDTH,GAME_HEIGHT,dt,
-        {
-            left: "a",
-            right: "d",
-            up: "w"
-        }
+  if (watergirl.visible) {
+    Collision.update(
+      watergirl,
+      allPlatforms,
+      keys2,
+      GAME_WIDTH,
+      GAME_HEIGHT,
+      dt,
+      {
+        left: "a",
+        right: "d",
+        up: "w",
+      },
     );
-    }
-
-    for (let button of buttons) {
-
-        const fireboyOnButton =
-            Collision.checkButtonCollision(player, button);
-
-        const watergirlOnButton =
-            Collision.checkButtonCollision(watergirl, button);
-
-        button.pressed =
-            fireboyOnButton || watergirlOnButton;
-    }
-    updateMovingPlatform(dt);
-
-    Collision.checkDiamondCollision(
-        player,
-        redDiamonds,
-        "red"
-    );
-
-    Collision.checkDiamondCollision(
-        watergirl,
-        blueDiamonds,
-        "blue"
-    );
-    checkLakeCollision();
-}
+  }
 
   for (let button of buttons) {
     const fireboyOnButton = Collision.checkButtonCollision(player, button);
@@ -287,43 +262,53 @@ function update(dt) {
   Collision.checkDiamondCollision(player, redDiamonds, "red");
 
   Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
+  checkLakeCollision();
+}
 
-  if (!fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
-    fireboyAtDoor = true;
-  }
+for (let button of buttons) {
+  const fireboyOnButton = Collision.checkButtonCollision(player, button);
 
-  if (!watergirlAtDoor && checkDoorCollision(watergirl, waterDoor)) {
-    watergirlAtDoor = true;
-  }
-  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
-  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
+  const watergirlOnButton = Collision.checkButtonCollision(watergirl, button);
 
-  const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
+  button.pressed = fireboyOnButton || watergirlOnButton;
+}
+updateMovingPlatform(dt);
 
-  const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
-  if (
-    allRedCollected &&
-    !fireboyAtDoor &&
-    checkDoorCollision(player, fireDoor)
-  ) {
-    fireboyAtDoor = true;
-  }
+Collision.checkDiamondCollision(player, redDiamonds, "red");
 
-  if (
-    allBlueCollected &&
-    !watergirlAtDoor &&
-    checkDoorCollision(watergirl, waterDoor)
-  ) {
-    watergirlAtDoor = true;
-  }
+Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
 
-  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
+if (!fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
+  fireboyAtDoor = true;
+}
 
-  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
+if (!watergirlAtDoor && checkDoorCollision(watergirl, waterDoor)) {
+  watergirlAtDoor = true;
+}
+updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
+updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
 
-  if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
-    gameWon = true;
-  }
+const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
+
+const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
+if (allRedCollected && !fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
+  fireboyAtDoor = true;
+}
+
+if (
+  allBlueCollected &&
+  !watergirlAtDoor &&
+  checkDoorCollision(watergirl, waterDoor)
+) {
+  watergirlAtDoor = true;
+}
+
+updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
+
+updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
+
+if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
+  gameWon = true;
 }
 
 function updateMovingPlatform(dt) {
@@ -438,21 +423,11 @@ function draw(time) {
   }
   movingPlatform.draw(ctx);
   movingPlatform2.draw(ctx);
-     ctx.fillStyle = "red";
-    ctx.fillRect(
-        fireLake.x,
-        fireLake.y,
-        fireLake.width,
-        fireLake.height
-    );
+  ctx.fillStyle = "red";
+  ctx.fillRect(fireLake.x, fireLake.y, fireLake.width, fireLake.height);
 
-    ctx.fillStyle = "blue";
-    ctx.fillRect(
-        waterLake.x,
-        waterLake.y,
-        waterLake.width,
-        waterLake.height
-    );
+  ctx.fillStyle = "blue";
+  ctx.fillRect(waterLake.x, waterLake.y, waterLake.width, waterLake.height);
 
   for (let button of buttons) {
     button.draw(ctx);
