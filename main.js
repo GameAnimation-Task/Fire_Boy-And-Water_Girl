@@ -5,6 +5,10 @@ import Player from "./player.js";
 import Button from "./button.js";
 import Diamond from "./diamond.js";
 
+const gameMusic = new Audio("audio/game-music.mp3");
+gameMusic.loop = true;
+gameMusic.volume = 0.3;
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const GAME_WIDTH = 1600;
@@ -216,9 +220,13 @@ function checkLakeCollision() {
 
     if (lake.color === "red" && watergirlCollision) {
       watergirl.visible = false;
+      gameOver = true;
+      gameMusic.pause();
     }
     if (lake.color === "blue" && fireboyCollision) {
       player.visible = false;
+      gameOver = true;
+      gameMusic.pause();
     }
   }
 }
@@ -301,6 +309,7 @@ function update(dt) {
 
   if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
     gameWon = true;
+    gameMusic.pause();
   }
 }
 const originalY1 = 830;
@@ -461,6 +470,7 @@ okButton.addEventListener("click", function () {
 playButton.addEventListener("click", function () {
   mainMenu.style.display = "none";
   canvas.style.display = "block";
-
+  gameMusic.currentTime = 0;
+  gameMusic.play().catch(() => {});
   requestAnimationFrame(animate);
 });
