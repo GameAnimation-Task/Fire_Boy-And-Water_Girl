@@ -292,15 +292,41 @@ function movePlayerWithPlatform(
         player.onGround
     ) {
 
-        player.y += dy;
-
-        player.y =
-            platform.y - player.height;
-
-        player.velocityY = 0;
-
-        player.onGround = true;
+  if (anyButtonPressed) {
+    if (movingPlatform.y > targetY) {
+      movingPlatform.y -= (speed * dt) / 1000;
+      if (movingPlatform.y < targetY) {
+        movingPlatform.y = targetY;
+      }
     }
+  } else {
+    if (movingPlatform.y < originalY) {
+      movingPlatform.y += (speed * dt) / 1000;
+      if (movingPlatform.y > originalY) {
+        movingPlatform.y = originalY;
+      }
+    }
+  }
+  const dy = movingPlatform.y - oldY;
+  movePlayerWithPlatform(player, oldY, dy);
+  movePlayerWithPlatform(watergirl, oldY, dy);
+}
+function movePlayerWithPlatform(player, oldY, dy) {
+  const horizontalCollision =
+    player.x + player.width > movingPlatform.x &&
+    player.x < movingPlatform.x + movingPlatform.width;
+
+  const standingOnPlatform = Math.abs(player.y + player.height - oldY) < 8;
+
+  if (horizontalCollision && standingOnPlatform && player.velocityY >= 0) {
+    player.y += dy;
+
+    player.y = movingPlatform.y - player.height;
+
+    player.velocityY = 0;
+
+    player.onGround = true;
+  }
 }
 
 function draw(time) {
