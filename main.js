@@ -49,7 +49,7 @@ const redDiamonds = [
 const blueDiamonds = [
   new Diamond(150, 430, 30, 30, blueDiamondImage, "blue"),
   new Diamond(900, 700, 30, 30, blueDiamondImage, "blue"),
-  new Diamond(1400, 320, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(1400, 280, 30, 30, blueDiamondImage, "blue"),
   new Diamond(170, 760, 30, 30, blueDiamondImage, "blue"),
 ];
 
@@ -292,33 +292,7 @@ function movePlayerWithPlatform(
         player.onGround
     ) {
 
-  if (anyButtonPressed) {
-    if (movingPlatform.y > targetY) {
-      movingPlatform.y -= (speed * dt) / 1000;
-      if (movingPlatform.y < targetY) {
-        movingPlatform.y = targetY;
-      }
-    }
-  } else {
-    if (movingPlatform.y < originalY) {
-      movingPlatform.y += (speed * dt) / 1000;
-      if (movingPlatform.y > originalY) {
-        movingPlatform.y = originalY;
-      }
-    }
-  }
-  const dy = movingPlatform.y - oldY;
-  movePlayerWithPlatform(player, oldY, dy);
-  movePlayerWithPlatform(watergirl, oldY, dy);
-}
-function movePlayerWithPlatform(player, oldY, dy) {
-  const horizontalCollision =
-    player.x + player.width > movingPlatform.x &&
-    player.x < movingPlatform.x + movingPlatform.width;
-
-  const standingOnPlatform = Math.abs(player.y + player.height - oldY) < 8;
-
-  if (horizontalCollision && standingOnPlatform && player.velocityY >= 0) {
+  
     player.y += dy;
 
     player.y = movingPlatform.y - player.height;
