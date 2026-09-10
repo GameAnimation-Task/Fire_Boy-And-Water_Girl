@@ -43,7 +43,7 @@ export default class Player {
     this.onGround = false;
     this.type = type;
     this.image = image;
-
+    this.visible=true;
     this.facing = 1;
     this.animations = FRAME_DATA[type];
     if (!this.animations) {
@@ -78,6 +78,9 @@ export default class Player {
   }
 
   draw(ctx) {
+     if (!this.visible) {
+        return;
+    }
     const frames = this.animations[this.state];
     const f = frames[this.frameIndex];
 
