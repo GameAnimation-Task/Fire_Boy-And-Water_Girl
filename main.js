@@ -259,66 +259,58 @@ function update(dt) {
   }
   updateMovingPlatform(dt);
 
-  Collision.checkDiamondCollision(player, redDiamonds, "red");
-
-  Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
+  if (player.visible) {
+    Collision.checkDiamondCollision(player, redDiamonds, "red");
+  }
+  if (watergirl.visible) {
+    Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
+  }
   checkLakeCollision();
+  if (!fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
+    fireboyAtDoor = true;
+  }
+
+  if (!watergirlAtDoor && checkDoorCollision(watergirl, waterDoor)) {
+    watergirlAtDoor = true;
+  }
+  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
+  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
+
+  const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
+
+  const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
+  if (
+    allRedCollected &&
+    !fireboyAtDoor &&
+    checkDoorCollision(player, fireDoor)
+  ) {
+    fireboyAtDoor = true;
+  }
+
+  if (
+    allBlueCollected &&
+    !watergirlAtDoor &&
+    checkDoorCollision(watergirl, waterDoor)
+  ) {
+    watergirlAtDoor = true;
+  }
+
+  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
+
+  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
+
+  if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
+    gameWon = true;
+  }
 }
-
-for (let button of buttons) {
-  const fireboyOnButton = Collision.checkButtonCollision(player, button);
-
-  const watergirlOnButton = Collision.checkButtonCollision(watergirl, button);
-
-  button.pressed = fireboyOnButton || watergirlOnButton;
-}
-updateMovingPlatform(dt);
-
-Collision.checkDiamondCollision(player, redDiamonds, "red");
-
-Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
-
-if (!fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
-  fireboyAtDoor = true;
-}
-
-if (!watergirlAtDoor && checkDoorCollision(watergirl, waterDoor)) {
-  watergirlAtDoor = true;
-}
-updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
-updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
-
-const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
-
-const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
-if (allRedCollected && !fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
-  fireboyAtDoor = true;
-}
-
-if (
-  allBlueCollected &&
-  !watergirlAtDoor &&
-  checkDoorCollision(watergirl, waterDoor)
-) {
-  watergirlAtDoor = true;
-}
-
-updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
-
-updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
-
-if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
-  gameWon = true;
-}
+const originalY1 = 830;
+const targetY1 = 500;
+const speed1 = 200;
 
 function updateMovingPlatform(dt) {
   const oldY1 = movingPlatform.y;
 
   const buttonForPlatform1 = button1.pressed || button2.pressed;
-
-  const originalY1 = 830;
-  const targetY1 = 500;
-  const speed1 = 200;
 
   if (buttonForPlatform1) {
     if (movingPlatform.y > targetY1) {
