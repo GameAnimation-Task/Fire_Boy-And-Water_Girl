@@ -117,7 +117,7 @@ static checkDiamondCollision(player, diamonds, type) {
             player.y + player.height > diamond.y;
 
         if (collision) {
-            diamonds.splice(i, 1);
+            diamond.collected = true;
         }
     }
 }   
