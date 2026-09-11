@@ -1,7 +1,7 @@
 import Collision from "./collision.js";
 import Platform from "./platform.js";
 import Player from "./player.js";
-
+import Lake from "./lake.js";
 import Button from "./button.js";
 import Diamond from "./diamond.js";
 
@@ -67,6 +67,9 @@ let gameWon = false;
 let gameOver = false;
 let fireboyAtDoor = false;
 let watergirlAtDoor = false;
+
+let sTime = 0;
+let gTime = 0;
 
 function drawDoor(door, image) {
   if (!image.complete || image.width === 0) return;
@@ -135,23 +138,12 @@ const platforms = [
   new Platform(0, 745, 490, 35, platformImage4),
   new Platform(0, 870, 1600, 30, platformImage5),
 ];
-const fireLake = {
-  x: 1120,
-  y: 860,
-  width: 80,
-  height: 30,
-  color: "#6a0902",
-};
 
-const waterLake = {
-  x: 1250,
-  y: 860,
-  width: 80,
-  height: 30,
-  color: "#00008b",
-};
-
-const lakes = [fireLake, waterLake];
+const fireLake = new Lake(1120, 865, 100, 20, "#6a0902", "fire");
+const waterLake = new Lake(1250, 860, 100, 20, "#00008b", "water");
+const fireLake2 = new Lake(500, 450, 100, 20, "#6a0902", "fire");
+const waterLake2 = new Lake(800, 290, 120, 20, "#00008b", "water");
+const lakes = [fireLake, waterLake, fireLake2, waterLake2];
 
 const keys = {};
 const keys2 = {};
@@ -210,12 +202,12 @@ function checkLakeCollision() {
       watergirl.y < lake.y + lake.height &&
       watergirl.y + watergirl.height > lake.y;
 
-    if (lake === fireLake && watergirlCollision) {
+    if (lake.type === "fire" && watergirlCollision) {
       watergirl.visible = false;
       gameOver = true;
       gameMusic.pause();
     }
-    if (lake === waterLake && fireboyCollision) {
+    if (lake.type === "water" && fireboyCollision) {
       player.visible = false;
       gameOver = true;
       gameMusic.pause();
@@ -224,6 +216,7 @@ function checkLakeCollision() {
 }
 
 function update(dt) {
+  gTime = Date.now() - sTime;
   const allPlatforms = [...platforms, movingPlatform, movingPlatform2];
 
   if (player.visible && !fireboyAtDoor) {
@@ -266,26 +259,31 @@ function update(dt) {
     Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
   }
   checkLakeCollision();
-  
 
-const allRedCollected = redDiamonds.every(
-  (diamond) => diamond.collected
-);
+  const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
 
-const allBlueCollected = blueDiamonds.every(
-  (diamond) => diamond.collected
-);
+  const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
 
-if (allRedCollected&&allBlueCollected &&!fireboyAtDoor &&checkDoorCollision(player, fireDoor)) {
-  fireboyAtDoor = true;
-}
-if (allBlueCollected &&allRedCollected&&!watergirlAtDoor &&checkDoorCollision(watergirl, waterDoor)) {
-  watergirlAtDoor = true;
-}
-if (allRedCollected &&allBlueCollected &&fireboyAtDoor &&watergirlAtDoor) {
-  gameWon = true;
-  gameMusic.pause();
-}
+  if (
+    allRedCollected &&
+    allBlueCollected &&
+    !fireboyAtDoor &&
+    checkDoorCollision(player, fireDoor)
+  ) {
+    fireboyAtDoor = true;
+  }
+  if (
+    allBlueCollected &&
+    allRedCollected &&
+    !watergirlAtDoor &&
+    checkDoorCollision(watergirl, waterDoor)
+  ) {
+    watergirlAtDoor = true;
+  }
+  if (allRedCollected && allBlueCollected && fireboyAtDoor && watergirlAtDoor) {
+    gameWon = true;
+    gameMusic.pause();
+  }
 }
 const originalY1 = 455;
 const targetY1 = 300;
@@ -388,10 +386,39 @@ function drawWinScreen() {
     canvas.width / 2,
     canvas.height / 2 + 30,
   );
-    ctx.font = "28px sans-serif";
+  ctx.font = "28px sans-serif";
 
   ctx.restore();
-   restartButton.style.display = "block";
+  restartButton.style.display = "block";
+}
+
+function drawDiamondCount() {
+  const redCollected = redDiamonds.filter(
+    (diamond) => diamond.collected,
+  ).length;
+  const blueCollected = blueDiamonds.filter(
+    (diamond) => diamond.collected,
+  ).length;
+
+  ctx.save();
+
+  ctx.font = "bold 16px 'Press Start 2P'";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#6a0902";
+  ctx.textAlign = "left";
+  ctx.fillText(
+    `Fireboy: ${redCollected}/${redDiamonds.length}`,
+    canvas.width - 235,
+    92,
+  );
+  ctx.fillStyle = "#00008b";
+  ctx.fillText(
+    `Watergirl: ${blueCollected}/${blueDiamonds.length}`,
+    canvas.width - 235,
+    62,
+  );
+
+  ctx.restore();
 }
 
 function draw(time) {
@@ -401,11 +428,10 @@ function draw(time) {
   }
   movingPlatform.draw(ctx);
   movingPlatform2.draw(ctx);
-  ctx.fillStyle = "red";
-  ctx.fillRect(fireLake.x, fireLake.y, fireLake.width, fireLake.height);
 
-  ctx.fillStyle = "blue";
-  ctx.fillRect(waterLake.x, waterLake.y, waterLake.width, waterLake.height);
+  for (let lake of lakes) {
+    lake.draw(ctx);
+  }
 
   for (let button of buttons) {
     button.draw(ctx);
@@ -421,12 +447,14 @@ function draw(time) {
   watergirl.draw(ctx);
   drawDoor(fireDoor, fireDoorImage);
   drawDoor(waterDoor, waterDoorImage);
+  drawDiamondCount();
+  drawTimer();
   if (gameWon) {
     drawWinScreen();
   }
   if (gameOver) {
-  drawGameOverScreen();
-}
+    drawGameOverScreen();
+  }
 }
 
 function animate(time) {
@@ -434,7 +462,7 @@ function animate(time) {
   lastTime = time;
   update(dt);
   draw(time);
-  if (!gameWon&&!gameOver) {
+  if (!gameWon && !gameOver) {
     requestAnimationFrame(animate);
   }
 }
@@ -449,24 +477,35 @@ function drawGameOverScreen() {
 
   ctx.font = "bold 70px sans-serif";
 
-  ctx.fillText(
-    "GAME OVER",
-    canvas.width / 2,
-    canvas.height / 2 - 50
-  );
+  ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 50);
 
   ctx.font = "28px sans-serif";
 
   ctx.fillText(
     "You touched the wrong lake!",
     canvas.width / 2,
-    canvas.height / 2 + 10
+    canvas.height / 2 + 10,
   );
 
   ctx.restore();
 
   restartButton.style.display = "block";
 }
+
+function drawTimer() {
+  const totalSeconds = Math.floor(gTime / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const timeText =
+    String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+  ctx.save();
+  ctx.font = "20px 'Press Start 2P'";
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.fillText(`TIME ${timeText}`, canvas.width / 2, 35);
+  ctx.restore();
+}
+
 function restartGame() {
   gameWon = false;
   gameOver = false;
@@ -507,6 +546,8 @@ function restartGame() {
   }
 
   lastTime = 0;
+  sTime = Date.now();
+  gTime = 0;
 
   gameMusic.currentTime = 0;
   gameMusic.play().catch(() => {});
@@ -527,6 +568,8 @@ restartButton.addEventListener("click", function () {
 playButton.addEventListener("click", function () {
   mainMenu.style.display = "none";
   canvas.style.display = "block";
+  sTime = Date.now();
+  gTime = 0;
   restartButton.style.display = "none";
   gameMusic.currentTime = 0;
   gameMusic.play().catch(() => {});
