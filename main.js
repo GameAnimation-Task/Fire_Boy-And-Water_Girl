@@ -16,6 +16,17 @@ const GAME_HEIGHT = 900;
 canvas.width = GAME_WIDTH;
 canvas.height = GAME_HEIGHT;
 
+const platformImage1 = new Image();
+platformImage1.src = "./assest/Tb1.png";
+const platformImage2 = new Image();
+platformImage2.src = "./assest/Tb3.png";
+const platformImage3 = new Image();
+platformImage3.src = "./assest/Tb5.png";
+const platformImage4 = new Image();
+platformImage4.src = "./assest/Tb4.png";
+const platformImage5 = new Image();
+platformImage5.src = "./assest/Tb2.png";
+
 const mainMenu = document.getElementById("mainMenu");
 const playButton = document.getElementById("playButton");
 const instructionsMenu = document.getElementById("instructionsMenu");
@@ -39,41 +50,25 @@ canvas.style.backgroundSize = "cover";
 canvas.style.backgroundPosition = "center";
 
 const fireDoor = {
-  x: 1360,
-  y: 35,
+  x: 0,
+  y: 60,
   width: 70,
   height: 100,
-  frame: 0,
-  maxFrame: 17,
+};
+const waterDoor = {
+  x: 90,
+  y: 60,
+  width: 70,
+  height: 100,
 };
 
-const waterDoor = {
-  x: 1480,
-  y: 45,
-  width: 70,
-  height: 90,
-  frame: 0,
-  maxFrame: 17,
-};
 let gameWon = false;
 let fireboyAtDoor = false;
 let watergirlAtDoor = false;
 
-function drawDoor(door, image, frameCount) {
+function drawDoor(door, image) {
   if (!image.complete || image.width === 0) return;
-  const frameWidth = image.width / frameCount;
-  const currentFrame = Math.floor(door.frame);
-  ctx.drawImage(
-    image,
-    frameWidth * door.frame,
-    0,
-    frameWidth,
-    image.height,
-    door.x,
-    door.y,
-    door.width,
-    door.height,
-  );
+  ctx.drawImage(image, door.x, door.y, door.width, door.height);
 }
 function checkDoorCollision(player, door) {
   const doorEntrance = {
@@ -89,15 +84,6 @@ function checkDoorCollision(player, door) {
     player.y + player.height > door.y
   );
 }
-function updateDoorAnimation(door, playerAtDoor, dt) {
-  if (playerAtDoor) {
-    door.frame += dt / 100;
-
-    if (door.frame > door.maxFrame) {
-      door.frame = door.maxFrame;
-    }
-  }
-}
 const buttonImage = new Image();
 buttonImage.src = "assest/Buttom1.png";
 const redDiamondImage = new Image();
@@ -107,7 +93,7 @@ const blueDiamondImage = new Image();
 blueDiamondImage.src = "assest/diamonds_blue.png";
 
 const player = new Player(30, 790, 50, 60, fireboyImage, "fire");
-const watergirl = new Player(100, 790, 50, 60, watergirlImage, "water");
+const watergirl = new Player(30, 610, 50, 60, watergirlImage, "water");
 const redDiamonds = [
   new Diamond(150, 800, 30, 30, redDiamondImage, "red"),
   new Diamond(470, 260, 30, 30, redDiamondImage, "red"),
@@ -117,46 +103,47 @@ const redDiamonds = [
 
 const blueDiamonds = [
   new Diamond(150, 430, 30, 30, blueDiamondImage, "blue"),
-  new Diamond(900, 700, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(950, 700, 30, 30, blueDiamondImage, "blue"),
   new Diamond(1250, 820, 30, 30, blueDiamondImage, "blue"),
-  new Diamond(180, 760, 30, 30, blueDiamondImage, "blue"),
+  new Diamond(180, 700, 30, 30, blueDiamondImage, "blue"),
 ];
 
-const movingPlatform = new Platform(350, 830, 400, 50);
-const movingPlatform2 = new Platform(1360, 820, 240, 50);
+const movingPlatform = new Platform(1400, 455, 205, 40, platformImage1);
+const movingPlatform2 = new Platform(1360, 830, 240, 40, platformImage3);
+
 movingPlatform.previousY = movingPlatform.y;
 movingPlatform2.previousY = movingPlatform2.y;
-const button1 = new Button(220, 850, 60, 20, buttonImage);
-const button2 = new Button(50, 470, 60, 20, buttonImage);
-const button3 = new Button(810, 730, 60, 20, buttonImage);
-const button4 = new Button(1160, 270, 60, 20, buttonImage);
-const buttons = [button1, button2, button3, button4];
-const platforms = [
-  new Platform(0, 0, 1600, 35),
-  new Platform(1315, 135, 255, 55),
-  new Platform(1080, 290, 190, 50),
 
-  new Platform(0, 490, 255, 50),
-  new Platform(300, 340, 420, 40),
-  new Platform(710, 465, 55, 430),
-  new Platform(0, 650, 205, 45),
-  new Platform(765, 750, 180, 50),
-  new Platform(0, 870, 1600, 30),
+const button1 = new Button(700, 435, 60, 20, buttonImage);
+const button2 = new Button(50, 280, 60, 20, buttonImage);
+const button3 = new Button(810, 850, 60, 20, buttonImage);
+const button4 = new Button(60, 520, 60, 20, buttonImage);
+const buttons = [button1, button2, button3, button4];
+
+const platforms = [
+  new Platform(0, 0, 1600, 40, platformImage5),
+  new Platform(0, 160, 580, 40, platformImage1),
+  new Platform(0, 300, 1410, 40, platformImage5),
+  new Platform(205, 455, 1200, 40, platformImage3),
+  new Platform(0, 540, 150, 80, platformImage2),
+  new Platform(0, 620, 1360, 40, platformImage5),
+  new Platform(0, 745, 490, 35, platformImage4),
+  new Platform(0, 870, 1600, 30, platformImage5),
 ];
 const fireLake = {
   x: 1120,
   y: 860,
   width: 100,
-  height: 20,
-  color: "red",
+  height: 10,
+  color: "#6a0902",
 };
 
 const waterLake = {
   x: 1250,
   y: 860,
   width: 100,
-  height: 20,
-  color: "blue",
+  height: 10,
+  color: "#00008b",
 };
 
 const lakes = [fireLake, waterLake];
@@ -234,7 +221,7 @@ function checkLakeCollision() {
 function update(dt) {
   const allPlatforms = [...platforms, movingPlatform, movingPlatform2];
 
-  if (player.visible) {
+  if (player.visible && !fireboyAtDoor) {
     Collision.update(player, allPlatforms, keys, GAME_WIDTH, GAME_HEIGHT, dt, {
       left: "ArrowLeft",
       right: "ArrowRight",
@@ -242,7 +229,7 @@ function update(dt) {
     });
   }
 
-  if (watergirl.visible) {
+  if (watergirl.visible && !watergirlAtDoor) {
     Collision.update(
       watergirl,
       allPlatforms,
@@ -281,12 +268,10 @@ function update(dt) {
   if (!watergirlAtDoor && checkDoorCollision(watergirl, waterDoor)) {
     watergirlAtDoor = true;
   }
-  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
-  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
 
   const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
-
   const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
+
   if (
     allRedCollected &&
     !fireboyAtDoor &&
@@ -294,7 +279,6 @@ function update(dt) {
   ) {
     fireboyAtDoor = true;
   }
-
   if (
     allBlueCollected &&
     !watergirlAtDoor &&
@@ -303,17 +287,13 @@ function update(dt) {
     watergirlAtDoor = true;
   }
 
-  updateDoorAnimation(fireDoor, fireboyAtDoor, dt);
-
-  updateDoorAnimation(waterDoor, watergirlAtDoor, dt);
-
   if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
     gameWon = true;
     gameMusic.pause();
   }
 }
-const originalY1 = 830;
-const targetY1 = 500;
+const originalY1 = 455;
+const targetY1 = 300;
 const speed1 = 200;
 
 function updateMovingPlatform(dt) {
@@ -349,8 +329,8 @@ function updateMovingPlatform(dt) {
 
   const buttonForPlatform2 = button3.pressed || button4.pressed;
 
-  const originalY2 = 820;
-  const targetY2 = 300;
+  const originalY2 = 830;
+  const targetY2 = 620;
   const speed2 = 200;
 
   if (buttonForPlatform2) {
@@ -442,8 +422,8 @@ function draw(time) {
   }
   player.draw(ctx);
   watergirl.draw(ctx);
-  drawDoor(fireDoor, fireDoorImage, 18);
-  drawDoor(waterDoor, waterDoorImage, 18);
+  drawDoor(fireDoor, fireDoorImage);
+  drawDoor(waterDoor, waterDoorImage);
   if (gameWon) {
     drawWinScreen();
   }
