@@ -38,7 +38,7 @@ export default class Player {
     this.height = height;
     this.speed = 5;
     this.velocityY = 0;
-    this.gravity = 0.3;
+    this.gravity = 0.5;
     this.jumpPower = -10;
     this.onGround = false;
     this.type = type;

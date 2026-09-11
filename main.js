@@ -32,6 +32,7 @@ const playButton = document.getElementById("playButton");
 const instructionsMenu = document.getElementById("instructionsMenu");
 const instructionsButton = document.getElementById("instructionsButton");
 const okButton = document.getElementById("okButton");
+const restartButton = document.getElementById("restartButton");
 
 const fireboyImage = new Image();
 fireboyImage.src = "assest/fire.png";
@@ -63,6 +64,7 @@ const waterDoor = {
 };
 
 let gameWon = false;
+let gameOver = false;
 let fireboyAtDoor = false;
 let watergirlAtDoor = false;
 
@@ -96,8 +98,8 @@ const player = new Player(30, 790, 50, 60, fireboyImage, "fire");
 const watergirl = new Player(30, 610, 50, 60, watergirlImage, "water");
 const redDiamonds = [
   new Diamond(150, 800, 30, 30, redDiamondImage, "red"),
-  new Diamond(470, 260, 30, 30, redDiamondImage, "red"),
-  new Diamond(1110, 260, 30, 30, redDiamondImage, "red"),
+  new Diamond(740, 220, 30, 30, redDiamondImage, "red"),
+  new Diamond(1110, 400, 30, 30, redDiamondImage, "red"),
   new Diamond(1130, 820, 30, 30, redDiamondImage, "red"),
 ];
 
@@ -115,7 +117,7 @@ movingPlatform.previousY = movingPlatform.y;
 movingPlatform2.previousY = movingPlatform2.y;
 
 const button1 = new Button(700, 435, 60, 20, buttonImage);
-const button2 = new Button(50, 280, 60, 20, buttonImage);
+const button2 = new Button(1100, 280, 60, 20, buttonImage);
 const button3 = new Button(810, 850, 60, 20, buttonImage);
 const button4 = new Button(60, 520, 60, 20, buttonImage);
 const buttons = [button1, button2, button3, button4];
@@ -123,7 +125,10 @@ const buttons = [button1, button2, button3, button4];
 const platforms = [
   new Platform(0, 0, 1600, 40, platformImage5),
   new Platform(0, 160, 580, 40, platformImage1),
-  new Platform(0, 300, 1410, 40, platformImage5),
+  new Platform(580, 200, 70, 32, platformImage3),
+  new Platform(650, 230, 70, 32, platformImage3),
+  new Platform(720, 260, 71, 40, platformImage3),
+  new Platform(790, 300, 610, 40, platformImage5),
   new Platform(205, 455, 1200, 40, platformImage3),
   new Platform(0, 540, 150, 80, platformImage2),
   new Platform(0, 620, 1360, 40, platformImage5),
@@ -133,16 +138,16 @@ const platforms = [
 const fireLake = {
   x: 1120,
   y: 860,
-  width: 100,
-  height: 10,
+  width: 80,
+  height: 30,
   color: "#6a0902",
 };
 
 const waterLake = {
   x: 1250,
   y: 860,
-  width: 100,
-  height: 10,
+  width: 80,
+  height: 30,
   color: "#00008b",
 };
 
@@ -205,12 +210,12 @@ function checkLakeCollision() {
       watergirl.y < lake.y + lake.height &&
       watergirl.y + watergirl.height > lake.y;
 
-    if (lake.color === "red" && watergirlCollision) {
+    if (lake === fireLake && watergirlCollision) {
       watergirl.visible = false;
       gameOver = true;
       gameMusic.pause();
     }
-    if (lake.color === "blue" && fireboyCollision) {
+    if (lake === waterLake && fireboyCollision) {
       player.visible = false;
       gameOver = true;
       gameMusic.pause();
@@ -261,36 +266,26 @@ function update(dt) {
     Collision.checkDiamondCollision(watergirl, blueDiamonds, "blue");
   }
   checkLakeCollision();
-  if (!fireboyAtDoor && checkDoorCollision(player, fireDoor)) {
-    fireboyAtDoor = true;
-  }
+  
 
-  if (!watergirlAtDoor && checkDoorCollision(watergirl, waterDoor)) {
-    watergirlAtDoor = true;
-  }
+const allRedCollected = redDiamonds.every(
+  (diamond) => diamond.collected
+);
 
-  const allRedCollected = redDiamonds.every((diamond) => diamond.collected);
-  const allBlueCollected = blueDiamonds.every((diamond) => diamond.collected);
+const allBlueCollected = blueDiamonds.every(
+  (diamond) => diamond.collected
+);
 
-  if (
-    allRedCollected &&
-    !fireboyAtDoor &&
-    checkDoorCollision(player, fireDoor)
-  ) {
-    fireboyAtDoor = true;
-  }
-  if (
-    allBlueCollected &&
-    !watergirlAtDoor &&
-    checkDoorCollision(watergirl, waterDoor)
-  ) {
-    watergirlAtDoor = true;
-  }
-
-  if (fireboyAtDoor && watergirlAtDoor && allRedCollected && allBlueCollected) {
-    gameWon = true;
-    gameMusic.pause();
-  }
+if (allRedCollected&&allBlueCollected &&!fireboyAtDoor &&checkDoorCollision(player, fireDoor)) {
+  fireboyAtDoor = true;
+}
+if (allBlueCollected &&allRedCollected&&!watergirlAtDoor &&checkDoorCollision(watergirl, waterDoor)) {
+  watergirlAtDoor = true;
+}
+if (allRedCollected &&allBlueCollected &&fireboyAtDoor &&watergirlAtDoor) {
+  gameWon = true;
+  gameMusic.pause();
+}
 }
 const originalY1 = 455;
 const targetY1 = 300;
@@ -393,8 +388,10 @@ function drawWinScreen() {
     canvas.width / 2,
     canvas.height / 2 + 30,
   );
+    ctx.font = "28px sans-serif";
 
   ctx.restore();
+   restartButton.style.display = "block";
 }
 
 function draw(time) {
@@ -427,6 +424,9 @@ function draw(time) {
   if (gameWon) {
     drawWinScreen();
   }
+  if (gameOver) {
+  drawGameOverScreen();
+}
 }
 
 function animate(time) {
@@ -434,11 +434,85 @@ function animate(time) {
   lastTime = time;
   update(dt);
   draw(time);
-  if (!gameWon) {
+  if (!gameWon&&!gameOver) {
     requestAnimationFrame(animate);
   }
 }
+function drawGameOverScreen() {
+  ctx.save();
 
+  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+
+  ctx.font = "bold 70px sans-serif";
+
+  ctx.fillText(
+    "GAME OVER",
+    canvas.width / 2,
+    canvas.height / 2 - 50
+  );
+
+  ctx.font = "28px sans-serif";
+
+  ctx.fillText(
+    "You touched the wrong lake!",
+    canvas.width / 2,
+    canvas.height / 2 + 10
+  );
+
+  ctx.restore();
+
+  restartButton.style.display = "block";
+}
+function restartGame() {
+  gameWon = false;
+  gameOver = false;
+
+  fireboyAtDoor = false;
+  watergirlAtDoor = false;
+
+  restartButton.style.display = "none";
+
+  player.x = 30;
+  player.y = 790;
+  player.visible = true;
+  player.velocityY = 0;
+  player.onGround = false;
+
+  watergirl.x = 30;
+  watergirl.y = 610;
+  watergirl.visible = true;
+  watergirl.velocityY = 0;
+  watergirl.onGround = false;
+
+  for (let diamond of redDiamonds) {
+    diamond.collected = false;
+  }
+
+  for (let diamond of blueDiamonds) {
+    diamond.collected = false;
+  }
+
+  movingPlatform.y = 455;
+  movingPlatform2.y = 830;
+
+  movingPlatform.previousY = 455;
+  movingPlatform2.previousY = 830;
+
+  for (let button of buttons) {
+    button.pressed = false;
+  }
+
+  lastTime = 0;
+
+  gameMusic.currentTime = 0;
+  gameMusic.play().catch(() => {});
+
+  requestAnimationFrame(animate);
+}
 instructionsButton.addEventListener("click", function () {
   mainMenu.style.display = "none";
   instructionsMenu.style.display = "flex";
@@ -447,9 +521,13 @@ okButton.addEventListener("click", function () {
   instructionsMenu.style.display = "none";
   mainMenu.style.display = "flex";
 });
+restartButton.addEventListener("click", function () {
+  restartGame();
+});
 playButton.addEventListener("click", function () {
   mainMenu.style.display = "none";
   canvas.style.display = "block";
+  restartButton.style.display = "none";
   gameMusic.currentTime = 0;
   gameMusic.play().catch(() => {});
   requestAnimationFrame(animate);
